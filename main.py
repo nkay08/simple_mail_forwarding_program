@@ -9,24 +9,30 @@
     # print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
 
+def test(rule: object):
+    print(rule.__dict__)
+
 # Press the green button in the gutter to run the script.
 import json
 
 if __name__ == '__main__':
-    # print_hi('PyCharm')
-    import mail_forwarder
-    import credentials
     import forwarding_rules
+    import loader
+    import periodic_job
+    import mail_forwarder
 
-    creds = credentials.Credentials("linkrotator@yahoo.com", "fwtlhvjwcyrwayiu", "imap.mail.yahoo.com")
-    rule = forwarding_rules.ForwardingRule(
-        from_address="linkrotator@yahoo.com",
-        to_address="n.klipp@nkay.info",
-        credentials=creds
-    )
+    rules = loader.load_all_rules()
 
-    rule = forwarding_rules.ForwardingRule.from_json_file("rules/linkrotator.json")
-    print(rule.__dict__)
+    # for k, v in rules.items():
+    #     print(v.__dict__)
+
+    # for k, v in rules.items():
+    #     periodic_job.schedule_function(v.schedule, test, [v])
+
+    mail_forwarder.schedule_rules(rules)
+
+    # rule = forwarding_rules.ForwardingRule.from_json_file("rules/linkrotator.json")
+    # print(rule.__dict__)
 
     # mails = mail_forwarder.fetch_emails(rule)
     # mail_forwarder.forward_mails(mails, rule)

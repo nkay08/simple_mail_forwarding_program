@@ -4,6 +4,7 @@ import logging
 from enums import FetchProtocol, MailStatus
 from forwarding_rules import ForwardingRule
 from mail_message import Email
+from periodic_job import schedule_function
 
 
 logger = logging.getLogger()
@@ -17,6 +18,11 @@ def save_mail_id_fetched(mail_id: str, rule: ForwardingRule):
 
 def save_mail_id_forwarded(mail_id: str, rule: ForwardingRule):
     pass
+
+
+def schedule_rules(rules: {ForwardingRule}):
+    for name, rule in rules.items():
+        schedule_function(rule.schedule, fetch_and_forward, [rule])
 
 
 def fetch_emails(rule: ForwardingRule, save_ids: bool = True) -> [Email]:
@@ -91,3 +97,7 @@ def forward_mail(mail: Email, rule: ForwardingRule, save_ids: bool = True):
 def forward_mails(mails: [Email], rule: ForwardingRule, save_ids: bool = True):
     for mail in mails:
         forward_mail(mail, rule, save_ids)
+
+
+def fetch_and_forward(rule: ForwardingRule, save_ids: bool = True):
+    print(rule.__dict__)
