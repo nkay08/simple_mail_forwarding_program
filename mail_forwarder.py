@@ -100,4 +100,4 @@ def forward_mails(mails: [Email], rule: ForwardingRule, save_ids: bool = True):
 
 
 def fetch_and_forward(rule: ForwardingRule, save_ids: bool = True):
-    print(rule.__dict__)
+    pass

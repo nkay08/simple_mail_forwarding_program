@@ -10,7 +10,7 @@ def schedule_function(interval: int, worker_func: callable, args: [] = None, kwa
             interval,
             schedule_function, [interval, worker_func, args, kwargs, 0 if iterations == 0 else iterations-1]
         ).start()
-    logger.warning("Scheduled to run {func} at interval {interval}\n\
+    logger.info("Scheduled to run {func} at interval {interval}\n\
      args: {args} \n\
       kwargs: {kwargs}".format(
         func=worker_func.__name__,

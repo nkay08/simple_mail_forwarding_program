@@ -14,7 +14,7 @@ class ForwardingRule(ConfigObject):
                  protocol: FetchProtocol = FetchProtocol.IMAP,
                  name: str = "",
                  save_ids: bool = True,
-                 schedule: int = 1
+                 schedule: int = 10
                  ) -> 'ForwardingRule':
         if not from_address:
             raise Exception("No FROM address specified")
