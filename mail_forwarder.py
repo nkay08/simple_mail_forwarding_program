@@ -91,6 +91,7 @@ def forward_mail(mail: Email, rule: ForwardingRule, save_ids: bool = True):
     if save_ids and rule.save_ids:
         # save_mail_id_forwarded(mail._)
         pass
+    # TODO
     raise NotImplementedError
 
 
@@ -100,5 +101,5 @@ def forward_mails(mails: [Email], rule: ForwardingRule, save_ids: bool = True):
 
 
 def fetch_and_forward(rule: ForwardingRule, save_ids: bool = True):
-    pass
-    raise NotImplementedError
+    mails: [Email] = fetch_emails(rule, save_ids)
+    forward_mails(mails, rule, save_ids)
