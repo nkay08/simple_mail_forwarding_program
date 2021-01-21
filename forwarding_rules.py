@@ -1,0 +1,139 @@
+from credentials import Credentials
+from enums import MailStatus, FetchProtocol
+
+
+class ForwardingRule:
+
+    def __init__(self,
+                 from_address: str,
+                 to_address: str,
+                 credentials: Credentials,
+                 status: MailStatus = MailStatus.UNREAD,
+                 folder: str = 'INBOX',
+                 protocol: FetchProtocol = FetchProtocol.IMAP,
+                 name: str = "",
+                 save_ids: bool = True
+                 ) -> 'ForwardingRule':
+        if not from_address:
+            raise Exception("No FROM address specified")
+        self._from_address = from_address
+
+        if not to_address:
+            raise Exception("No TO address specified")
+        self._to_address = to_address
+
+        if not credentials:
+            raise Exception("No credentials specified")
+        self._credentials = credentials
+
+        if not status:
+            raise Exception("No status condition. Default is UNREAD.")
+        self._status = status
+
+        if not folder:
+            raise Exception("No folder specified. Default is INBOX.")
+        self._folder = folder
+
+        if not protocol:
+            raise Exception("No protocol specified. Default is IMAP.")
+        self._protocol = protocol
+
+        if not name:
+            self.name = self._credentials.host
+
+        self._save_ids = save_ids
+
+    @property
+    def from_address(self) -> str:
+        return self._from_address
+
+    @from_address.setter
+    def from_address(self, from_address: str):
+        self._from_address = from_address
+
+    @property
+    def to_address(self) -> str:
+        return self._to_address
+
+    @to_address.setter
+    def to_address(self, to_address: str):
+        self._to_address = to_address
+
+    @property
+    def credentials(self) -> Credentials:
+        return self._credentials
+
+    @credentials.setter
+    def credentials(self, credentials: Credentials):
+        self._credentials = credentials
+
+    @property
+    def folder(self) -> str:
+        return self._folder
+
+    @folder.setter
+    def folder(self, folder: str):
+        self._folder = folder
+
+    @property
+    def status(self) -> MailStatus:
+        return self._status
+
+    @status.setter
+    def status(self, status: MailStatus):
+        self._status = status
+
+    @property
+    def protocol(self) -> FetchProtocol:
+        return self._protocol
+
+    @protocol.setter
+    def protocol(self, protocol: FetchProtocol):
+        self._protocol = protocol
+
+    @property
+    def save_ids(self) -> bool:
+        return self._save_ids
+
+    @staticmethod
+    def from_json(json_dict: dict) -> 'Email':
+        if not json_dict.get('credentials', False):
+            raise Exception("No credentials specified for rule.")
+
+        creds_raw: dict = json_dict.get('credentials')
+        if type(creds_raw) is dict:
+            creds = Credentials.from_json(creds_raw)
+        else:
+            if not creds_raw.get('username', False):
+                raise Exception("No username provided")
+            if not creds_raw.get('password', False):
+                raise Exception("No password provided")
+            if not creds_raw.get('host', False):
+                raise Exception("No host provided")
+
+            creds = Credentials(
+                                creds_raw.get('username'),
+                                creds_raw.get('password'),
+                                creds_raw.get('host')
+                                )
+
+        rule_attrs: dict = {'credentials': creds}
+
+        if creds_raw.get('from_address', False):
+            rule_attrs['from_address'] = creds_raw.get('from_address')
+        if creds_raw.get('to_address', False):
+            rule_attrs['to_address'] = creds_raw.get('to_address')
+        if creds_raw.get('status', False):
+            rule_attrs['status'] = creds_raw.get('status')
+        if creds_raw.get('folder', False):
+            rule_attrs['folder'] = creds_raw.get('folder')
+        if creds_raw.get('protocol', False):
+            rule_attrs['protocol'] = creds_raw.get('protocol')
+        if creds_raw.get('name', False):
+            rule_attrs['name'] = creds_raw.get('name')
+        if creds_raw.get('save_ids', False):
+            rule_attrs['save_ids'] = creds_raw.get('save_ids')
+            
+        return ForwardingRule(**rule_attrs)
+
+
