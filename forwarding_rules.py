@@ -13,7 +13,8 @@ class ForwardingRule(ConfigObject):
                  folder: str = 'INBOX',
                  protocol: FetchProtocol = FetchProtocol.IMAP,
                  name: str = "",
-                 save_ids: bool = True
+                 save_ids: bool = True,
+                 schedule: int = 1
                  ) -> 'ForwardingRule':
         if not from_address:
             raise Exception("No FROM address specified")
@@ -43,7 +44,14 @@ class ForwardingRule(ConfigObject):
             self.name = self._credentials.host
 
         self._save_ids = save_ids
+        self._schedule = schedule
 
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return self.__class__.__name__ + "::" + self.name
+    
     @property
     def from_address(self) -> str:
         return self._from_address
@@ -93,8 +101,17 @@ class ForwardingRule(ConfigObject):
         self._protocol = protocol
 
     @property
+    def schedule(self) -> int:
+        return self._schedule
+
+    @schedule.setter
+    def schedule(self, schedule: int):
+        self._schedule = schedule
+
+    @property
     def save_ids(self) -> bool:
         return self._save_ids
+
 
     def _from_json(json_dict: dict) -> 'Email':
         # if not json_dict.get('credentials', False):
@@ -132,5 +149,16 @@ class ForwardingRule(ConfigObject):
             kwargs['name'] = json_dict.get('name')
         if json_dict.get('save_ids', False):
             kwargs['save_ids'] = json_dict.get('save_ids')
+        if json_dict.get('schedule', False):
+            kwargs['schedule'] = json_dict.get('schedule')
 
         return ForwardingRule(*args, **kwargs)
+
+    @classmethod
+    def from_json_file(cls, filepath: str) -> 'ForwardingRule':
+        obj: ForwardingRule = super().from_json_file(filepath)
+
+        from pathlib import Path
+        obj.name = Path(filepath).stem
+
+        return obj
