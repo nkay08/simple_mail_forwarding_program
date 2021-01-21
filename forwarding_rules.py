@@ -1,3 +1,5 @@
+import json
+
 from credentials import Credentials
 from enums import MailStatus, FetchProtocol
 
@@ -97,25 +99,23 @@ class ForwardingRule:
 
     @staticmethod
     def from_json(json_dict: dict) -> 'Email':
-        if not json_dict.get('credentials', False):
-            raise Exception("No credentials specified for rule.")
+        # if not json_dict.get('credentials', False):
+        #     raise Exception("No credentials specified for rule.")
 
-        creds_raw: dict = json_dict.get('credentials')
-        if type(creds_raw) is dict:
-            creds = Credentials.from_json(creds_raw)
+        if json_dict.get('credentials', False):
+            # Load credentials from nested json
+            creds_raw = json_dict.get('credentials')
+            if type(creds_raw) is dict:
+                # if credentials is dict, load it
+                creds = Credentials.from_json(creds_raw)
+            elif type(creds_raw) is str:
+                # if credentials is str, load from file
+                creds = Credentials.from_json_file(creds_raw)
+            else:
+                raise Exception("Credentials not in a suitable format")
         else:
-            if not creds_raw.get('username', False):
-                raise Exception("No username provided")
-            if not creds_raw.get('password', False):
-                raise Exception("No password provided")
-            if not creds_raw.get('host', False):
-                raise Exception("No host provided")
-
-            creds = Credentials(
-                                creds_raw.get('username'),
-                                creds_raw.get('password'),
-                                creds_raw.get('host')
-                                )
+            # Load credentials directly from non-nested json
+            creds = Credentials.from_json(json_dict)
 
         kwargs: dict = {'credentials': creds}
         args = []
@@ -137,4 +137,11 @@ class ForwardingRule:
 
         return ForwardingRule(*args, **kwargs)
 
+    @staticmethod
+    def from_json_file(filepath) -> 'ForwardingRule':
+        rule: ForwardingRule = None
+        with open(filepath) as file:
+            rule = ForwardingRule.from_json(json.load(file))
+
+        return rule
 

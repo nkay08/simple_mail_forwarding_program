@@ -25,9 +25,8 @@ if __name__ == '__main__':
         credentials=creds
     )
 
-    with open("rules/linkrotator.json") as file:
-        rule = forwarding_rules.ForwardingRule.from_json(json.load(file))
-        print(rule.__dict__)
+    rule = forwarding_rules.ForwardingRule.from_json_file("rules/linkrotator.json")
+    print(rule.__dict__)
 
     # mails = mail_forwarder.fetch_emails(rule)
     # mail_forwarder.forward_mails(mails, rule)

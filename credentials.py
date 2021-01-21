@@ -1,3 +1,6 @@
+import json
+
+
 class Credentials:
 
     def __init__(self, username, password, host):
@@ -55,3 +58,11 @@ class Credentials:
             json_dict.get('password'),
             json_dict.get('host')
         )
+
+    @staticmethod
+    def from_json_file(filepath) -> 'Credentials':
+        creds: Credentials = None
+        with open(filepath) as file:
+            creds = Credentials.from_json(json.load(file))
+
+        return creds
