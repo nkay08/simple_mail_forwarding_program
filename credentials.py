@@ -44,4 +44,14 @@ class Credentials:
 
     @staticmethod
     def from_json(json_dict: dict):
-        raise NotImplementedError
+        if not json_dict.get('username', False):
+            raise Exception("No username provided")
+        if not json_dict.get('password', False):
+            raise Exception("No password provided")
+        if not json_dict.get('host', False):
+            raise Exception("No host provided")
+        return Credentials(
+            json_dict.get('username'),
+            json_dict.get('password'),
+            json_dict.get('host')
+        )

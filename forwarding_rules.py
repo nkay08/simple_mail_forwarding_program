@@ -117,23 +117,24 @@ class ForwardingRule:
                                 creds_raw.get('host')
                                 )
 
-        rule_attrs: dict = {'credentials': creds}
+        kwargs: dict = {'credentials': creds}
+        args = []
 
-        if creds_raw.get('from_address', False):
-            rule_attrs['from_address'] = creds_raw.get('from_address')
-        if creds_raw.get('to_address', False):
-            rule_attrs['to_address'] = creds_raw.get('to_address')
-        if creds_raw.get('status', False):
-            rule_attrs['status'] = creds_raw.get('status')
-        if creds_raw.get('folder', False):
-            rule_attrs['folder'] = creds_raw.get('folder')
-        if creds_raw.get('protocol', False):
-            rule_attrs['protocol'] = creds_raw.get('protocol')
-        if creds_raw.get('name', False):
-            rule_attrs['name'] = creds_raw.get('name')
-        if creds_raw.get('save_ids', False):
-            rule_attrs['save_ids'] = creds_raw.get('save_ids')
-            
-        return ForwardingRule(**rule_attrs)
+        if json_dict.get('from_address', False):
+            args.append(json_dict.get('from_address'))
+        if json_dict.get('to_address', False):
+            args.append(json_dict.get('to_address'))
+        if json_dict.get('status', False):
+            kwargs['status'] = json_dict.get('status')
+        if json_dict.get('folder', False):
+            kwargs['folder'] = json_dict.get('folder')
+        if json_dict.get('protocol', False):
+            kwargs['protocol'] = json_dict.get('protocol')
+        if json_dict.get('name', False):
+            kwargs['name'] = json_dict.get('name')
+        if json_dict.get('save_ids', False):
+            kwargs['save_ids'] = json_dict.get('save_ids')
+
+        return ForwardingRule(*args, **kwargs)
 
 

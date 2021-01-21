@@ -10,6 +10,8 @@
 
 
 # Press the green button in the gutter to run the script.
+import json
+
 if __name__ == '__main__':
     # print_hi('PyCharm')
     import mail_forwarder
@@ -23,7 +25,11 @@ if __name__ == '__main__':
         credentials=creds
     )
 
-    mails = mail_forwarder.fetch_emails(rule)
+    with open("rules/linkrotator.json") as file:
+        rule = forwarding_rules.ForwardingRule.from_json(json.load(file))
+        print(rule.__dict__)
+
+    # mails = mail_forwarder.fetch_emails(rule)
     # mail_forwarder.forward_mails(mails, rule)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
