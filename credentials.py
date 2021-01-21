@@ -1,7 +1,7 @@
-import json
+from base import ConfigObject
 
 
-class Credentials:
+class Credentials(ConfigObject):
 
     def __init__(self, username, password, host):
         if not username:
@@ -46,7 +46,7 @@ class Credentials:
         return Credentials(None, None, None)
 
     @staticmethod
-    def from_json(json_dict: dict):
+    def _from_json(json_dict: dict) -> 'Credentials':
         if not json_dict.get('username', False):
             raise Exception("No username provided")
         if not json_dict.get('password', False):
@@ -58,11 +58,3 @@ class Credentials:
             json_dict.get('password'),
             json_dict.get('host')
         )
-
-    @staticmethod
-    def from_json_file(filepath) -> 'Credentials':
-        creds: Credentials = None
-        with open(filepath) as file:
-            creds = Credentials.from_json(json.load(file))
-
-        return creds

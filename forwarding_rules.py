@@ -1,10 +1,9 @@
-import json
-
 from credentials import Credentials
 from enums import MailStatus, FetchProtocol
+from base import ConfigObject
 
 
-class ForwardingRule:
+class ForwardingRule(ConfigObject):
 
     def __init__(self,
                  from_address: str,
@@ -97,8 +96,7 @@ class ForwardingRule:
     def save_ids(self) -> bool:
         return self._save_ids
 
-    @staticmethod
-    def from_json(json_dict: dict) -> 'Email':
+    def _from_json(json_dict: dict) -> 'Email':
         # if not json_dict.get('credentials', False):
         #     raise Exception("No credentials specified for rule.")
 
@@ -136,12 +134,3 @@ class ForwardingRule:
             kwargs['save_ids'] = json_dict.get('save_ids')
 
         return ForwardingRule(*args, **kwargs)
-
-    @staticmethod
-    def from_json_file(filepath) -> 'ForwardingRule':
-        rule: ForwardingRule = None
-        with open(filepath) as file:
-            rule = ForwardingRule.from_json(json.load(file))
-
-        return rule
-
