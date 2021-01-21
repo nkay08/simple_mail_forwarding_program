@@ -1,6 +1,7 @@
 import threading
 import logging
 
+logging.basicConfig(format='%(asctime)s %(message)s')
 logger = logging.getLogger()
 
 
@@ -18,14 +19,24 @@ def schedule_function(interval: int, worker_func: callable, args: [] = None, kwa
         args=args,
         kwargs=kwargs)
     )
-
-    if args and kwargs:
-        worker_func(*args, **kwargs)
-    elif args:
-        worker_func(*args)
-    elif kwargs:
-        worker_func(**kwargs)
-    else:
-        worker_func()
+    try:
+        if args and kwargs:
+            worker_func(*args, **kwargs)
+        elif args:
+            worker_func(*args)
+        elif kwargs:
+            worker_func(**kwargs)
+        else:
+            worker_func()
+    except Exception as e:
+        logger.error("Encountered error in scheduled function {func} at interval {interval}\n\
+            args: {args} \n\
+            kwargs: {kwargs}".format(
+            func=worker_func.__name__,
+            interval=interval,
+            args=args,
+            kwargs=kwargs)
+        )
+        logger.error(e, exc_info=True)
 
 

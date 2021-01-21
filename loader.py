@@ -21,8 +21,6 @@ def load_all_rules(rules_dir: str = RULES_DIR) -> {ForwardingRule}:
 
     files = glob.glob(rules_files)
 
-    print(files)
-
     if files:
         for file in files:
             current_rule: ForwardingRule = ForwardingRule.from_json_file(file)
