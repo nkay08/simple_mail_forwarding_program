@@ -23,12 +23,13 @@ if __name__ == '__main__':
 
     rules = loader.load_all_rules()
 
-    for k, v in rules.items():
-        print(v.__dict__)
-        print(v.credentials.__dict__)
-        print(v.credentials_outgoing.__dict__)
-
     # for k, v in rules.items():
+    #     print(v.__dict__)
+    #     print(v.credentials.__dict__)
+    #     print(v.credentials_outgoing.__dict__)
+
+    for k, v in rules.items():
+        mails = mail_forwarder.fetch_emails(v)
     #     periodic_job.schedule_function(v.schedule, test, [v])
 
     # mail_forwarder.schedule_rules(rules)

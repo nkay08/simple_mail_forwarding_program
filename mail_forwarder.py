@@ -29,19 +29,19 @@ def fetch_emails(rule: ForwardingRule, save_ids: bool = True) -> [Email]:
     # raise NotImplementedError
 
     if rule.protocol == FetchProtocol.IMAP:
-        client = imaplib.IMAP4_SSL(rule.credentials.host)
+        server_conn = imaplib.IMAP4_SSL(rule.credentials.host)
     elif rule.protocol == FetchProtocol.POP3:
         raise NotImplementedError
     else:
-        client: imaplib.IMAP4_SSL = imaplib.IMAP4_SSL(rule.credentials.host)
+        server_conn: imaplib.IMAP4_SSL = imaplib.IMAP4_SSL(rule.credentials.host)
 
-    client.login(rule.credentials.username, rule.credentials.password)
-    client.select()
+    server_conn.login(rule.credentials.username, rule.credentials.password)
+    server_conn.select()
     # By default inbox
-    # client.select(rule.folder)
+    # server_conn.select(rule.folder)
 
     # can also be ALL
-    return_code, data = client.search(None, 'UnSeen')
+    return_code, data = server_conn.search(None, 'UnSeen')
 
     mail_ids: str = data[0].decode()
     id_list: [str] = mail_ids.split()
@@ -56,8 +56,9 @@ def fetch_emails(rule: ForwardingRule, save_ids: bool = True) -> [Email]:
         emails = []
 
         for mail_id in id_list:
-            typ, data = client.fetch(str(mail_id), '(RFC822)')
-            current_mail: Email = Email.from_bytes(data[0][1])
+            typ, data = server_conn.fetch(str(mail_id), '(RFC822)')
+            resp, uid = server_conn.fetch(str(mail_id), 'UID')
+            current_mail: Email = Email.from_bytes(data[0][1], mail_id)
 
             # print(current_mail.subject, current_mail.from_address, current_mail.to_address)
             # print(current_mail.body)
@@ -74,13 +75,15 @@ def fetch_emails(rule: ForwardingRule, save_ids: bool = True) -> [Email]:
             if rule.save_ids:
                 save_mail_id_fetched(str(mail_id), rule)
 
+            # TODO remove line
+            mark_unseen(current_mail, server_conn)
     else:
         logger.warning("No new messages")
-
+    server_conn.close()
     return fetched_mails
 
 
-def forward_mail(mail: Email, rule: ForwardingRule, server: smtplib.SMTP, save_ids: bool = True):
+def forward_mail(mail: Email, rule: ForwardingRule, server_conn: smtplib.SMTP, save_ids: bool = True):
     mail.add_original_sender()
     # print(current_mail.body_text)
 
@@ -92,22 +95,38 @@ def forward_mail(mail: Email, rule: ForwardingRule, server: smtplib.SMTP, save_i
         # save_mail_id_forwarded(mail._)
         pass
     # TODO
-    server.send_message(mail.email)
+    server_conn.send_message(mail.email)
 
 
 def forward_mails(mails: [Email], rule: ForwardingRule, save_ids: bool = True):
     error_mails = []
     if len(mails) > 0:
-        with smtplib.SMTP_SSL(rule.credentials_outgoing.host, rule.credentials_outgoing.username, rule.credentials_outgoing.password) as server:
+        with smtplib.SMTP_SSL(rule.credentials_outgoing.host) as server:
+            server.login(rule.credentials_outgoing.username, rule.credentials_outgoing.password)
             for mail in mails:
                 try:
                     forward_mail(mail, rule, server, save_ids)
                 except Exception as e:
                     logger.error(e)
                     error_mails.append(mail)
-
+    reset_mail_status(error_mails, rule)
 
 
 def fetch_and_forward(rule: ForwardingRule, save_ids: bool = True):
     mails: [Email] = fetch_emails(rule, save_ids)
     forward_mails(mails, rule, save_ids)
+
+
+def reset_mail_status(mails: [Email], rule: ForwardingRule):
+
+    if len(mails > 0):
+        with imaplib.IMAP4_SSL(rule.credentials.host) as server_conn:
+            server_conn.login(rule.credentials.username, rule.credentials.password)
+            mark_unseen(mail, server)
+
+
+def mark_seen(mail: Email, server_conn: imaplib.IMAP4):
+    server_conn.store(mail.id, '-FLAGS', '\Seen')
+
+def mark_unseen(mail: Email, server_conn: imaplib.IMAP4):
+    server_conn.store(mail.id, '-FLAGS', '\Seen')

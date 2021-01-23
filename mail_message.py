@@ -17,16 +17,17 @@ class Email:
 
     _email: EmailMessage = None
 
-    def __init__(self, mail: EmailMessage):
+    def __init__(self, mail: EmailMessage, uid):
         self._email: EmailMessage = mail
+        self._id = uid
 
     @staticmethod
-    def from_bytes(email_bytes) -> 'Email2':
-        return Email(message_from_bytes(email_bytes, policy=email_default_policy))
+    def from_bytes(email_bytes, uid) -> 'Email':
+        return Email(message_from_bytes(email_bytes, policy=email_default_policy), uid)
 
     @staticmethod
-    def from_string(email_string) -> 'Email2':
-        return Email(message_from_string(email_string, policy=email_default_policy))
+    def from_string(email_string, uid) -> 'Email':
+        return Email(message_from_string(email_string, policy=email_default_policy), uid)
 
     @property
     def subject(self) -> str:
@@ -111,7 +112,4 @@ class Email:
 
     @property
     def id(self):
-        if 'message-id' in self._email:
-            return self._email['message-id']
-
-        return None
+        return self._id
