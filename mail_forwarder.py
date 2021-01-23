@@ -80,7 +80,7 @@ def fetch_emails(rule: ForwardingRule, save_ids: bool = True) -> [Email]:
     return fetched_mails
 
 
-def forward_mail(mail: Email, rule: ForwardingRule, save_ids: bool = True):
+def forward_mail(mail: Email, rule: ForwardingRule, server: smtplib.SMTP, save_ids: bool = True):
     mail.add_original_sender()
     # print(current_mail.body_text)
 
@@ -92,14 +92,20 @@ def forward_mail(mail: Email, rule: ForwardingRule, save_ids: bool = True):
         # save_mail_id_forwarded(mail._)
         pass
     # TODO
-    raise NotImplementedError
+    server.send_message(mail.email)
 
 
 def forward_mails(mails: [Email], rule: ForwardingRule, save_ids: bool = True):
-
+    error_mails = []
     if len(mails) > 0:
-        for mail in mails:
-            forward_mail(mail, rule, save_ids)
+        with smtplib.SMTP_SSL(rule.credentials_outgoing.host, rule.credentials_outgoing.username, rule.credentials_outgoing.password) as server:
+            for mail in mails:
+                try:
+                    forward_mail(mail, rule, server, save_ids)
+                except Exception as e:
+                    logger.error(e)
+                    error_mails.append(mail)
+
 
 
 def fetch_and_forward(rule: ForwardingRule, save_ids: bool = True):

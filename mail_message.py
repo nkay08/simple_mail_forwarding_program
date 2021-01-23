@@ -96,6 +96,10 @@ class Email:
         self._email.replace_header('to', address)
         # self._email['to'] = address
 
+    @property
+    def email(self) -> EmailMessage:
+        return self._email
+
     def set_header(self, header: str, value: str):
         try:
             self._email.replace_header(header, value)
