@@ -23,8 +23,9 @@ def load_all_rules(rules_dir: str = RULES_DIR) -> {ForwardingRule}:
 
     if files:
         for file in files:
-            current_rule: ForwardingRule = ForwardingRule.from_json_file(file)
-            rules[current_rule.name] = current_rule
+            if os.path.basename(file) != "sample.json":
+                current_rule: ForwardingRule = ForwardingRule.from_json_file(file)
+                rules[current_rule.name] = current_rule
     else:
         logger.warning("No rules found in: {dir}".format(dir=rules_dir))
     return rules

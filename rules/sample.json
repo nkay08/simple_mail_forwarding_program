@@ -1,0 +1,18 @@
+{
+  "credentials": {
+    "incoming": {
+      "username": "xxx@zzz.com",
+      "password": "HelloWorld",
+      "host": "imap.zzz.com",
+      "type": "incoming"
+    },
+    "outgoing": {
+      "username": "xxx@xxx.com",
+      "password": "HelloWorld",
+      "host": "imap.zzz.com",
+      "type": "outgoing"
+    }
+  },
+  "from_address": "xxx@zzz.com",
+  "to_address": "yyy@zzz.com"
+}
