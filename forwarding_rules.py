@@ -9,6 +9,7 @@ class ForwardingRule(ConfigObject):
                  from_address: str,
                  to_address: str,
                  credentials: Credentials,
+                 credentials_outgoing: Credentials,
                  status: MailStatus = MailStatus.UNREAD,
                  folder: str = 'INBOX',
                  protocol: FetchProtocol = FetchProtocol.IMAP,
@@ -27,6 +28,10 @@ class ForwardingRule(ConfigObject):
         if not credentials:
             raise Exception("No credentials specified")
         self._credentials = credentials
+
+        if not credentials_outgoing:
+            raise Exception("No credentials specified")
+        self._credentials_outgoing = credentials_outgoing
 
         if not status:
             raise Exception("No status condition. Default is UNREAD.")
@@ -77,6 +82,14 @@ class ForwardingRule(ConfigObject):
         self._credentials = credentials
 
     @property
+    def credentials_outgoing(self) -> Credentials:
+        return self._credentials_outgoing
+
+    @credentials_outgoing.setter
+    def credentials_outgoing(self, credentials: Credentials):
+        self._credentials_outgoing = credentials_outgoing
+
+    @property
     def folder(self) -> str:
         return self._folder
 
@@ -120,19 +133,39 @@ class ForwardingRule(ConfigObject):
         if json_dict.get('credentials', False):
             # Load credentials from nested json
             creds_raw = json_dict.get('credentials')
-            if type(creds_raw) is dict:
-                # if credentials is dict, load it
-                creds = Credentials.from_json(creds_raw)
-            elif type(creds_raw) is str:
-                # if credentials is str, load from file
-                creds = Credentials.from_json_file(creds_raw)
-            else:
-                raise Exception("Credentials not in a suitable format")
-        else:
-            # Load credentials directly from non-nested json
-            creds = Credentials.from_json(json_dict)
 
-        kwargs: dict = {'credentials': creds}
+            if creds_raw.get('incoming', False):
+                creds_incoming_raw = creds_raw.get('incoming')
+                if type(creds_incoming_raw) is dict:
+                    # if credentials is dict, load it
+                    creds_incoming = Credentials.from_json(creds_incoming_raw)
+                elif type(creds_incoming_raw) is str:
+                    # if credentials is str, load from file
+                    creds = Credentials.from_json_file(creds_incoming_raw)
+                else:
+                    raise Exception("Credentials not in a suitable format")
+            else:
+                raise Exception("No credentials for incoming mails")
+
+            if creds_raw.get('outgoing', False):
+                creds_outgoing_raw = creds_raw.get('outgoing')
+                if type(creds_outgoing_raw) is dict:
+                    # if credentials is dict, load it
+                    creds_outgoing = Credentials.from_json(creds_outgoing_raw)
+                elif type(creds_outgoing_raw) is str:
+                    # if credentials is str, load from file
+                    creds_outgoing = Credentials.from_json_file(creds_outgoing_raw)
+                else:
+                    raise Exception("Credentials not in a suitable format")
+            else:
+                raise Exception("No credentials for incoming mails")
+        else:
+            # Legacy
+            # # Load credentials directly from non-nested json
+            # creds = Credentials.from_json(json_dict)
+            raise Exception("No credentials")
+
+        kwargs: dict = {'credentials': creds_incoming, 'credentials_outgoing': creds_outgoing}
         args = []
 
         if json_dict.get('from_address', False):

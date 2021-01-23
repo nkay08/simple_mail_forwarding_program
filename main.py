@@ -25,11 +25,13 @@ if __name__ == '__main__':
 
     # for k, v in rules.items():
     #     print(v.__dict__)
+    #     print(v.credentials.__dict__)
+    #     print(v.credentials_outgoing.__dict__)
 
     # for k, v in rules.items():
     #     periodic_job.schedule_function(v.schedule, test, [v])
 
-    mail_forwarder.schedule_rules(rules)
+    # mail_forwarder.schedule_rules(rules)
 
     # rule = forwarding_rules.ForwardingRule.from_json_file("rules/linkrotator.json")
     # print(rule.__dict__)

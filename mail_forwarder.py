@@ -96,8 +96,10 @@ def forward_mail(mail: Email, rule: ForwardingRule, save_ids: bool = True):
 
 
 def forward_mails(mails: [Email], rule: ForwardingRule, save_ids: bool = True):
-    for mail in mails:
-        forward_mail(mail, rule, save_ids)
+
+    if len(mails) > 0:
+        for mail in mails:
+            forward_mail(mail, rule, save_ids)
 
 
 def fetch_and_forward(rule: ForwardingRule, save_ids: bool = True):
