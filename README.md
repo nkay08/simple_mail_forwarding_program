@@ -21,6 +21,12 @@ The original sender is instead added to the `REPLY-TO` header and as text/html t
     - Sample is available in folder and won't be loaded
 - Run `main.py`
 
+### Docker
+- build (or fetch `nkay08/smfp`) and execute the Docker image from `Dockerfile` with
+    - `docker build . -t smfp`
+    - `docker run smfp`
+- OR build and run with `docker-compose`
+    - `docker-compose up [-d]`
 
 
 ## Settings  
