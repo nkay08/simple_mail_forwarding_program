@@ -118,8 +118,6 @@ def forward_mail(mail: Email, rule: ForwardingRule, server_conn: smtplib.SMTP, s
         # save_mail_id_forwarded(mail._)
         pass
 
-    raise NotImplementedError
-
     server_conn.send_message(mail.email)
 
 
