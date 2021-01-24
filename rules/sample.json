@@ -9,7 +9,7 @@
     "outgoing": {
       "username": "xxx@xxx.com",
       "password": "HelloWorld",
-      "host": "imap.zzz.com",
+      "host": "smtp.zzz.com",
       "type": "outgoing"
     }
   },
