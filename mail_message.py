@@ -1,4 +1,5 @@
 from email.message import EmailMessage, Message
+from email.mime.text import MIMEText
 from email import message_from_string, message_from_bytes
 from email.policy import default as email_default_policy # use this policy to get EmailMessage instead of Message object
 import logging
@@ -56,13 +57,20 @@ class Email:
         self.body_add_line_html(line)
 
     def body_add_line_text(self, line: str):
+
+        new_line = "* " + str(line)
         text = self.body_text
-        if text:
-            new_line = "* " + str(line)
-            split = text.as_string().split("\n")[3:]
+
+        strtext = str(text)
+        if len(strtext) > 7:
+            if strtext[:8] == "Received" and self.body_html is None:
+                strtext = self._email.get_payload()
+        if strtext is not None:
+            split = strtext.split("\n")
             split.insert(0, new_line)
             new_text = "\n".join(split)
             text.set_payload(new_text)
+
 
     def body_add_line_html(self, line: str):
         html = self.body_html

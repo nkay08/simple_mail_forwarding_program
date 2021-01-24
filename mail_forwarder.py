@@ -72,32 +72,16 @@ def fetch_emails(rule: ForwardingRule, save_ids: bool = True) -> [Email]:
 
     if len(id_list) > 0:
         logger.info("List of new mail ids: {ids}".format(ids=id_list))
-        first_email_id = int(id_list[0])
-        latest_email_id = int(id_list[-1])
+        # first_email_id = int(id_list[0])
+        # latest_email_id = int(id_list[-1])
 
-        emails = []
 
         for mail_id in id_list:
             typ, data = fetch_mail(mail_id, server_conn)
             current_mail: Email = Email.from_bytes(data[0][1], mail_id)
 
-            # print(current_mail.subject, current_mail.from_address, current_mail.to_address)
-            # print(current_mail.body)
-            # current_mail.body_add_line_text("ORIGINAL_FROM: " + current_mail.from_address)
-            #
-            # print(current_mail.body_text)
-            current_mail.add_original_sender()
-            # print(current_mail.body_text)
-
-            current_mail.set_reply_to(current_mail.from_address)
-            current_mail.from_address = rule.from_address
-            current_mail.to_address = rule.to_address
-
             if rule.save_ids:
                 save_mail_id_fetched(str(mail_id), rule)
-
-            # TODO remove line
-            # mark_unseen(current_mail, server_conn)
 
             fetched_mails.append(current_mail)
     else:
@@ -107,12 +91,13 @@ def fetch_emails(rule: ForwardingRule, save_ids: bool = True) -> [Email]:
 
 
 def forward_mail(mail: Email, rule: ForwardingRule, server_conn: smtplib.SMTP, save_ids: bool = True):
+
     mail.add_original_sender()
-    # print(current_mail.body_text)
 
     mail.set_reply_to(mail.from_address)
     mail.from_address = rule.from_address
     mail.to_address = rule.to_address
+
 
     if save_ids and rule.save_ids:
         # save_mail_id_forwarded(mail._)
