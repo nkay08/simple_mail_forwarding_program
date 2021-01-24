@@ -21,6 +21,12 @@ class Email:
         self._email: EmailMessage = mail
         self._id = uid
 
+    def __str__(self):
+        return self._id
+
+    def __repr__(self):
+        return self.__class__.__name__ + "::" + self._id
+
     @staticmethod
     def from_bytes(email_bytes, uid) -> 'Email':
         return Email(message_from_bytes(email_bytes, policy=email_default_policy), uid)

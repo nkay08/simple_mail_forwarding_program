@@ -25,6 +25,13 @@ def schedule_rules(rules: {ForwardingRule}):
         schedule_function(rule.schedule, fetch_and_forward, [rule])
 
 
+def fetch_mail(mail_id, server_conn: imaplib.IMAP4):
+    if type(mail_id) == str or type(mail_id) == str:
+        return server_conn.fetch(str(mail_id), '(RFC822)')
+    elif type(mail_id) == Email:
+        return server_conn.fetch(mail_id.id, '(RFC822)')
+
+
 def fetch_emails(rule: ForwardingRule, save_ids: bool = True) -> [Email]:
     # raise NotImplementedError
 
@@ -56,8 +63,7 @@ def fetch_emails(rule: ForwardingRule, save_ids: bool = True) -> [Email]:
         emails = []
 
         for mail_id in id_list:
-            typ, data = server_conn.fetch(str(mail_id), '(RFC822)')
-            resp, uid = server_conn.fetch(str(mail_id), 'UID')
+            typ, data = fetch_mail(mail_id, server_conn)
             current_mail: Email = Email.from_bytes(data[0][1], mail_id)
 
             # print(current_mail.subject, current_mail.from_address, current_mail.to_address)
@@ -76,7 +82,9 @@ def fetch_emails(rule: ForwardingRule, save_ids: bool = True) -> [Email]:
                 save_mail_id_fetched(str(mail_id), rule)
 
             # TODO remove line
-            mark_unseen(current_mail, server_conn)
+            # mark_unseen(current_mail, server_conn)
+
+            fetched_mails.append(current_mail)
     else:
         logger.warning("No new messages")
     server_conn.close()
@@ -94,21 +102,27 @@ def forward_mail(mail: Email, rule: ForwardingRule, server_conn: smtplib.SMTP, s
     if save_ids and rule.save_ids:
         # save_mail_id_forwarded(mail._)
         pass
-    # TODO
+
+    raise NotImplementedError
+
     server_conn.send_message(mail.email)
 
 
 def forward_mails(mails: [Email], rule: ForwardingRule, save_ids: bool = True):
     error_mails = []
     if len(mails) > 0:
+        logger.info("Try forwarding mails for rule: {rule}".format(rule=rule.name))
         with smtplib.SMTP_SSL(rule.credentials_outgoing.host) as server:
             server.login(rule.credentials_outgoing.username, rule.credentials_outgoing.password)
             for mail in mails:
+                logger.info("Forwarding mail with uid: {uid}".format(uid=mail.id))
                 try:
                     forward_mail(mail, rule, server, save_ids)
                 except Exception as e:
                     logger.error(e)
                     error_mails.append(mail)
+    else:
+        logger.info("No mails to forward for rule: {rule}".format(rule=rule.name))
     reset_mail_status(error_mails, rule)
 
 
@@ -118,15 +132,18 @@ def fetch_and_forward(rule: ForwardingRule, save_ids: bool = True):
 
 
 def reset_mail_status(mails: [Email], rule: ForwardingRule):
-
-    if len(mails > 0):
+    if len(mails) > 0:
+        logger.info("Resetting mail status for rule {rule} and mails: [{mails}]".format(rule=rule.name, mails=mails))
         with imaplib.IMAP4_SSL(rule.credentials.host) as server_conn:
             server_conn.login(rule.credentials.username, rule.credentials.password)
-            mark_unseen(mail, server)
+            server_conn.select()
+            for mail in mails:
+                mark_unseen(mail, server_conn)
 
 
 def mark_seen(mail: Email, server_conn: imaplib.IMAP4):
     server_conn.store(mail.id, '-FLAGS', '\Seen')
+
 
 def mark_unseen(mail: Email, server_conn: imaplib.IMAP4):
     server_conn.store(mail.id, '-FLAGS', '\Seen')

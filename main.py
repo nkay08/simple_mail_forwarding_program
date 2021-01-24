@@ -1,19 +1,12 @@
-# This is a sample Python script.
+# !/bin/python3
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-# def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    # print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-def test(rule: object):
-    print(rule.__dict__)
-
-# Press the green button in the gutter to run the script.
 import json
+import logging
+
+logging.basicConfig(format='%(asctime)s %(message)s')
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 
 if __name__ == '__main__':
     import forwarding_rules
@@ -23,21 +16,11 @@ if __name__ == '__main__':
 
     rules = loader.load_all_rules()
 
-    # for k, v in rules.items():
-    #     print(v.__dict__)
-    #     print(v.credentials.__dict__)
-    #     print(v.credentials_outgoing.__dict__)
+    # for rulename, rule in rules.items():
+    #     print("Executing rule ", rulename)
+    #     mails = mail_forwarder.fetch_emails(rule)
+    #     mail_forwarder.forward_mails(mails, rule)
 
-    for k, v in rules.items():
-        mails = mail_forwarder.fetch_emails(v)
-    #     periodic_job.schedule_function(v.schedule, test, [v])
+    mail_forwarder.schedule_rules(rules)
 
-    # mail_forwarder.schedule_rules(rules)
 
-    # rule = forwarding_rules.ForwardingRule.from_json_file("rules/linkrotator.json")
-    # print(rule.__dict__)
-
-    # mails = mail_forwarder.fetch_emails(rule)
-    # mail_forwarder.forward_mails(mails, rule)
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
