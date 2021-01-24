@@ -9,4 +9,4 @@ COPY . /smfp
 RUN cd /smfp \
     && pipenv --python /usr/local/bin/python install --system
 
-CMD ["/usr/bin/python3", "/smfp/main.py"]
+CMD ["/usr/local/bin/python", "/smfp/main.py"]
