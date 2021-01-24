@@ -14,5 +14,7 @@
     }
   },
   "from_address": "xxx@zzz.com",
-  "to_address": "yyy@zzz.com"
+  "to_address": "yyy@zzz.com",
+  "schedule": 1800,
+  "save_ids": true
 }

@@ -12,11 +12,26 @@ logger = logging.getLogger()
 # -----------------------------------
 
 
+
 def save_mail_id_fetched(mail_id: str, rule: ForwardingRule):
+    """
+    This function shall save the ids of fetched emails in a local db.
+    :param mail_id:
+    :param rule:
+    :return:
+    """
+    # TODO
     pass
 
 
 def save_mail_id_forwarded(mail_id: str, rule: ForwardingRule):
+    """
+    This function shall save the ids of forwarded emails in a local db.
+    :param mail_id:
+    :param rule:
+    :return:
+    """
+    # TODO
     pass
 
 
