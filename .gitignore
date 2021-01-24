@@ -2,3 +2,5 @@
 /venv/
 /rules/*
 !/rules/sample.json
+
+.idea

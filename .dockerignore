@@ -1,1 +1,7 @@
 rules/*
+Dockerfile
+docker-compose.yml
+.dockerignore
+.git
+.gitignore
+.idea
