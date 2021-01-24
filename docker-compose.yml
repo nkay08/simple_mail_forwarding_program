@@ -1,0 +1,9 @@
+version: "3.3"
+services:
+
+  smfp:
+    image: nkay08/smfp
+    build: .
+    volumes:
+      - ./rules:/smfp/rules
+    restart: always
