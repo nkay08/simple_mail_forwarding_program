@@ -29,6 +29,7 @@ def schedule_function(interval: int, worker_func: callable, args: [] = None, kwa
     except Exception as e:
         logger.error(e, exc_info=True)
 
+
     try:
         if args and kwargs:
             worker_func(*args, **kwargs)

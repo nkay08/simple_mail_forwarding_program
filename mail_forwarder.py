@@ -140,7 +140,7 @@ def reset_mail_status(mails: [Email], rule: ForwardingRule):
 
 
 def mark_seen(mail: Email, server_conn: imaplib.IMAP4):
-    server_conn.store(mail.id, '-FLAGS', '\Seen')
+    server_conn.store(mail.id, '+FLAGS', '\Seen')
 
 
 def mark_unseen(mail: Email, server_conn: imaplib.IMAP4):
