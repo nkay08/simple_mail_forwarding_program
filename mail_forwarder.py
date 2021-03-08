@@ -92,7 +92,7 @@ def fetch_emails(rule: ForwardingRule, save_ids: bool = True) -> [Email]:
 
 def forward_mail(mail: Email, rule: ForwardingRule, server_conn: smtplib.SMTP, save_ids: bool = True):
 
-    mail.add_original_sender()
+    #mail.add_original_sender()
 
     mail.set_reply_to(mail.from_address)
     mail.from_address = rule.from_address
