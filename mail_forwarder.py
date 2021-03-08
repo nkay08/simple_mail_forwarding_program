@@ -4,6 +4,9 @@ import logging
 from enums import FetchProtocol, MailStatus
 from forwarding_rules import ForwardingRule
 from mail_message import Email
+from email.mime.text import MIMEText
+from email.mime.message import MIMEMessage
+from email.mime.multipart import MIMEMultipart
 from periodic_job import schedule_function
 
 
@@ -91,25 +94,28 @@ def fetch_emails(rule: ForwardingRule, save_ids: bool = True) -> [Email]:
 
 
 def forward_mail(mail: Email, rule: ForwardingRule, server_conn: smtplib.SMTP, save_ids: bool = True):
+    logger.info("Sending mail {mail}".format(mail=mail))
 
-    #mail.add_original_sender()
+    part1 = MIMEText("")
+    part2 = MIMEMessage(mail.email)
 
-    mail.set_reply_to(mail.from_address)
-    mail.from_address = rule.from_address
-    mail.to_address = rule.to_address
-
-
-    if save_ids and rule.save_ids:
-        # save_mail_id_forwarded(mail._)
-        pass
-
-    server_conn.send_message(mail.email)
+    new_email = MIMEMultipart()
+    new_email['Subject'] = mail.subject
+    new_email['From'] = rule.from_address
+    new_email['To'] = rule.to_address
+    if rule.set_reply_to:
+        new_email['Reply-To'] = mail.from_address
+    new_email.attach(part1)
+    new_email.attach(part2)
+    server_conn.send_message(new_email)
+    logger.info("Successfully sent mail {mail}".format(mail=mail))
 
 
 def forward_mails(mails: [Email], rule: ForwardingRule, save_ids: bool = True):
     error_mails = []
     if len(mails) > 0:
         logger.info("Try forwarding mails for rule: {rule}".format(rule=rule.name))
+
         with smtplib.SMTP_SSL(rule.credentials_outgoing.host) as server:
             server.login(rule.credentials_outgoing.username, rule.credentials_outgoing.password)
             for mail in mails:
@@ -137,6 +143,7 @@ def reset_mail_status(mails: [Email], rule: ForwardingRule):
             server_conn.select()
             for mail in mails:
                 mark_unseen(mail, server_conn)
+        logger.info("Done RESET mail status for rule {rule} and mails: [{mails}]".format(rule=rule.name, mails=mails))
 
 
 def mark_seen(mail: Email, server_conn: imaplib.IMAP4):
