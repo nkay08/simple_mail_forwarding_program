@@ -15,7 +15,8 @@ class ForwardingRule(ConfigObject):
                  protocol: FetchProtocol = FetchProtocol.IMAP,
                  name: str = "",
                  save_ids: bool = True,
-                 schedule: int = 1800 # Half an hour
+                 schedule: int = 1800, # Half an hour
+                 set_reply_to: bool = False # Set Reply-To header to original FROM address. This header is not allowed to be different to the NEW From address on some servers
                  ) -> 'ForwardingRule':
         if not from_address:
             raise Exception("No FROM address specified")
@@ -48,8 +49,11 @@ class ForwardingRule(ConfigObject):
         if not name:
             self.name = self._credentials.host
 
+
+
         self._save_ids = save_ids
         self._schedule = schedule
+        self.set_reply_to = set_reply_to
 
     def __str__(self):
         return self.name
@@ -122,6 +126,14 @@ class ForwardingRule(ConfigObject):
         self._schedule = schedule
 
     @property
+    def set_reply_to(self) -> int:
+        return self._set_reply_to
+
+    @set_reply_to.setter
+    def set_reply_to(self, set_reply_to: int):
+        self._set_reply_to = set_reply_to
+
+    @property
     def save_ids(self) -> bool:
         return self._save_ids
 
@@ -184,6 +196,8 @@ class ForwardingRule(ConfigObject):
             kwargs['save_ids'] = json_dict.get('save_ids')
         if json_dict.get('schedule', False):
             kwargs['schedule'] = json_dict.get('schedule')
+        if json_dict.get('set_reply_to', False):
+            kwargs['set_reply_to'] = json_dict.get('set_reply_to')
 
         return ForwardingRule(*args, **kwargs)
 
