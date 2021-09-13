@@ -3,7 +3,7 @@ services:
 
   smfp:
     image: nkay08/smfp
-    build: .
+#    build: .
     volumes:
       - ./rules:/smfp/rules
     restart: always
